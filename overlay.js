@@ -4,11 +4,14 @@ const Overlay = (function() {
     const EDIT_MAX_SIZE = 1200;  // Lower res for smooth editing
     const OUTPUT_MAX_SIZE = 4800; // High res for final output
 
+    // Pagination settings
+    const PAGES_PER_VIEW = 4;
+
     // State
     const state = {
         layers: {
-            1: { file: null, doc: null, selectedPage: null, canvas: null },
-            2: { file: null, doc: null, selectedPage: null, canvas: null }
+            1: { file: null, doc: null, selectedPage: null, canvas: null, pageOffset: 0, totalPages: 0 },
+            2: { file: null, doc: null, selectedPage: null, canvas: null, pageOffset: 0, totalPages: 0 }
         },
         brushMode: 'bottom', // 'bottom' reveals bottom layer, 'top' reveals top layer
         brushSize: 30,
@@ -62,7 +65,9 @@ const Overlay = (function() {
         });
 
         dropZone.addEventListener('click', e => {
-            if (!e.target.closest('.overlay-page-thumb') && !e.target.closest('.overlay-page-select')) {
+            if (!e.target.closest('.overlay-page-thumb') &&
+                !e.target.closest('.overlay-page-select') &&
+                !e.target.closest('.overlay-pagination')) {
                 fileInput.click();
             }
         });
@@ -74,6 +79,7 @@ const Overlay = (function() {
 
         state.layers[layerId].file = file;
         state.layers[layerId].selectedPage = null;
+        state.layers[layerId].pageOffset = 0;
 
         dropZone.classList.add('has-pages');
         pagesContainer.innerHTML = '<div class="loading">Loading</div>';
@@ -82,18 +88,85 @@ const Overlay = (function() {
             const arrayBuffer = await file.arrayBuffer();
             const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
             state.layers[layerId].doc = pdf;
+            state.layers[layerId].totalPages = pdf.numPages;
 
-            pagesContainer.innerHTML = '';
-
-            for (let i = 1; i <= pdf.numPages; i++) {
-                const page = await pdf.getPage(i);
-                const thumb = await renderOverlayThumb(page, layerId, i);
-                pagesContainer.appendChild(thumb);
-            }
+            await renderPageThumbnails(layerId);
         } catch (error) {
             console.error('Error loading PDF:', error);
             pagesContainer.innerHTML = '<span style="color: #cc0000;">Error loading PDF</span>';
         }
+    }
+
+    async function renderPageThumbnails(layerId) {
+        const pagesContainer = document.getElementById(`overlay-pages-${layerId}`);
+        const layer = state.layers[layerId];
+        const { doc, pageOffset, totalPages, selectedPage } = layer;
+
+        // Build new content in a fragment first
+        const fragment = document.createDocumentFragment();
+
+        // Create wrapper for thumbnails
+        const thumbsWrapper = document.createElement('div');
+        thumbsWrapper.className = 'overlay-thumbs-wrapper';
+
+        // Render visible pages
+        const startPage = pageOffset + 1;
+        const endPage = Math.min(pageOffset + PAGES_PER_VIEW, totalPages);
+
+        for (let i = startPage; i <= endPage; i++) {
+            const page = await doc.getPage(i);
+            const thumb = await renderOverlayThumb(page, layerId, i);
+            if (selectedPage === i) {
+                thumb.classList.add('selected');
+            }
+            thumbsWrapper.appendChild(thumb);
+        }
+
+        fragment.appendChild(thumbsWrapper);
+
+        // Add pagination if needed
+        if (totalPages > PAGES_PER_VIEW) {
+            const pagination = document.createElement('div');
+            pagination.className = 'overlay-pagination';
+
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'btn btn-small btn-secondary';
+            prevBtn.innerHTML = '&larr;';
+            prevBtn.disabled = pageOffset === 0;
+            prevBtn.onclick = (e) => {
+                e.stopPropagation();
+                navigatePages(layerId, -PAGES_PER_VIEW);
+            };
+
+            const pageInfo = document.createElement('span');
+            pageInfo.className = 'page-info';
+            pageInfo.textContent = `${startPage}-${endPage} of ${totalPages}`;
+
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'btn btn-small btn-secondary';
+            nextBtn.innerHTML = '&rarr;';
+            nextBtn.disabled = pageOffset + PAGES_PER_VIEW >= totalPages;
+            nextBtn.onclick = (e) => {
+                e.stopPropagation();
+                navigatePages(layerId, PAGES_PER_VIEW);
+            };
+
+            pagination.appendChild(prevBtn);
+            pagination.appendChild(pageInfo);
+            pagination.appendChild(nextBtn);
+            fragment.appendChild(pagination);
+        }
+
+        // Swap content all at once
+        pagesContainer.innerHTML = '';
+        pagesContainer.appendChild(fragment);
+    }
+
+    function navigatePages(layerId, delta) {
+        const layer = state.layers[layerId];
+        const newOffset = layer.pageOffset + delta;
+        layer.pageOffset = Math.max(0, Math.min(newOffset, layer.totalPages - 1));
+        renderPageThumbnails(layerId);
     }
 
     async function renderOverlayThumb(page, layerId, pageNum) {

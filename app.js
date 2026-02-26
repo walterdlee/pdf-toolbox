@@ -119,7 +119,7 @@ async function loadPdf(pdfId, file) {
     state.pdfs[pdfId].pages = [];
 
     // Update UI
-    nameEl.textContent = `PDF ${pdfId}: ${file.name}`;
+    nameEl.textContent = file.name;
     dropZone.classList.add('has-pages');
     pageGrid.innerHTML = '<div class="loading">Loading PDF</div>';
 
