@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Toolbox</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>PDF Toolbox</h1>
+            <p class="subtitle">Select and merge pages from two PDFs</p>
+        </header>
+
+        <div class="pdf-panels">
+            <div class="pdf-panel" id="pdf1-panel">
+                <div class="panel-header">
+                    <span class="pdf-name" id="pdf1-name">PDF 1: Drop or click to upload</span>
+                    <div class="panel-actions">
+                        <button class="btn btn-small" onclick="selectAll(1)">Select All</button>
+                        <button class="btn btn-small btn-secondary" onclick="clearSelection(1)">Clear</button>
+                    </div>
+                </div>
+                <div class="drop-zone" id="drop-zone-1">
+                    <input type="file" id="file-input-1" accept="application/pdf" hidden>
+                    <div class="drop-zone-prompt">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                        <span>Drop PDF here or click to browse</span>
+                    </div>
+                    <div class="page-grid" id="page-grid-1"></div>
+                </div>
+            </div>
+
+            <div class="pdf-panel" id="pdf2-panel">
+                <div class="panel-header">
+                    <span class="pdf-name" id="pdf2-name">PDF 2: Drop or click to upload</span>
+                    <div class="panel-actions">
+                        <button class="btn btn-small" onclick="selectAll(2)">Select All</button>
+                        <button class="btn btn-small btn-secondary" onclick="clearSelection(2)">Clear</button>
+                    </div>
+                </div>
+                <div class="drop-zone" id="drop-zone-2">
+                    <input type="file" id="file-input-2" accept="application/pdf" hidden>
+                    <div class="drop-zone-prompt">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                        <span>Drop PDF here or click to browse</span>
+                    </div>
+                    <div class="page-grid" id="page-grid-2"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="output-section">
+            <div class="section-header">
+                <h2>Output Queue</h2>
+                <span class="hint">Drag to reorder, click to remove</span>
+            </div>
+            <div class="output-queue" id="output-queue">
+                <div class="queue-empty">Selected pages will appear here</div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="btn btn-secondary btn-large" id="preview-btn" onclick="previewMergedPdf()" disabled>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+                Preview
+            </button>
+            <button class="btn btn-primary btn-large" id="download-btn" onclick="downloadMergedPdf()" disabled>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Download Merged PDF
+            </button>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div class="modal" id="preview-modal">
+        <div class="modal-backdrop" onclick="closePreview()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title" id="modal-title">Preview</span>
+                <div class="modal-nav">
+                    <button class="btn btn-small" id="prev-page-btn" onclick="prevPreviewPage()">&larr; Prev</button>
+                    <span class="page-indicator" id="page-indicator">1 / 1</span>
+                    <button class="btn btn-small" id="next-page-btn" onclick="nextPreviewPage()">Next &rarr;</button>
+                </div>
+                <button class="modal-close" onclick="closePreview()">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <canvas id="preview-canvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
