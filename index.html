@@ -12,81 +12,211 @@
     <div class="container">
         <header>
             <h1>PDF Toolbox</h1>
-            <p class="subtitle">Select and merge pages from two PDFs</p>
+            <nav class="tabs">
+                <button class="tab active" data-tab="merger">Page Merger</button>
+                <button class="tab" data-tab="overlay">Page Overlay</button>
+            </nav>
         </header>
 
-        <div class="pdf-panels">
-            <div class="pdf-panel" id="pdf1-panel">
-                <div class="panel-header">
-                    <span class="pdf-name" id="pdf1-name">PDF 1: Drop or click to upload</span>
-                    <div class="panel-actions">
-                        <button class="btn btn-small" onclick="selectAll(1)">Select All</button>
-                        <button class="btn btn-small btn-secondary" onclick="clearSelection(1)">Clear</button>
+        <!-- Page Merger Tool -->
+        <div id="merger-tool" class="tool-panel active">
+            <p class="tool-description">Select and merge pages from two PDFs into one document</p>
+
+            <div class="pdf-panels">
+                <div class="pdf-panel" id="pdf1-panel">
+                    <div class="panel-header">
+                        <span class="pdf-name" id="pdf1-name">PDF 1: Drop or click to upload</span>
+                        <div class="panel-actions">
+                            <button class="btn btn-small btn-secondary" onclick="document.getElementById('file-input-1').click()">Change File</button>
+                            <button class="btn btn-small" onclick="selectAll(1)">Select All</button>
+                            <button class="btn btn-small btn-secondary" onclick="clearSelection(1)">Clear</button>
+                        </div>
+                    </div>
+                    <div class="drop-zone" id="drop-zone-1">
+                        <input type="file" id="file-input-1" accept="application/pdf" hidden>
+                        <div class="drop-zone-prompt">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                            <span>Drop PDF here or click to browse</span>
+                        </div>
+                        <div class="page-grid" id="page-grid-1"></div>
                     </div>
                 </div>
-                <div class="drop-zone" id="drop-zone-1">
-                    <input type="file" id="file-input-1" accept="application/pdf" hidden>
-                    <div class="drop-zone-prompt">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                            <polyline points="17 8 12 3 7 8"/>
-                            <line x1="12" y1="3" x2="12" y2="15"/>
-                        </svg>
-                        <span>Drop PDF here or click to browse</span>
+
+                <div class="pdf-panel" id="pdf2-panel">
+                    <div class="panel-header">
+                        <span class="pdf-name" id="pdf2-name">PDF 2: Drop or click to upload</span>
+                        <div class="panel-actions">
+                            <button class="btn btn-small btn-secondary" onclick="document.getElementById('file-input-2').click()">Change File</button>
+                            <button class="btn btn-small" onclick="selectAll(2)">Select All</button>
+                            <button class="btn btn-small btn-secondary" onclick="clearSelection(2)">Clear</button>
+                        </div>
                     </div>
-                    <div class="page-grid" id="page-grid-1"></div>
+                    <div class="drop-zone" id="drop-zone-2">
+                        <input type="file" id="file-input-2" accept="application/pdf" hidden>
+                        <div class="drop-zone-prompt">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                            <span>Drop PDF here or click to browse</span>
+                        </div>
+                        <div class="page-grid" id="page-grid-2"></div>
+                    </div>
                 </div>
             </div>
 
-            <div class="pdf-panel" id="pdf2-panel">
-                <div class="panel-header">
-                    <span class="pdf-name" id="pdf2-name">PDF 2: Drop or click to upload</span>
-                    <div class="panel-actions">
-                        <button class="btn btn-small" onclick="selectAll(2)">Select All</button>
-                        <button class="btn btn-small btn-secondary" onclick="clearSelection(2)">Clear</button>
-                    </div>
+            <div class="output-section">
+                <div class="section-header">
+                    <h2>Output Queue</h2>
+                    <span class="hint">Drag to reorder, click to remove</span>
                 </div>
-                <div class="drop-zone" id="drop-zone-2">
-                    <input type="file" id="file-input-2" accept="application/pdf" hidden>
-                    <div class="drop-zone-prompt">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                            <polyline points="17 8 12 3 7 8"/>
-                            <line x1="12" y1="3" x2="12" y2="15"/>
-                        </svg>
-                        <span>Drop PDF here or click to browse</span>
-                    </div>
-                    <div class="page-grid" id="page-grid-2"></div>
+                <div class="output-queue" id="output-queue">
+                    <div class="queue-empty">Selected pages will appear here</div>
                 </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-secondary btn-large" id="preview-btn" onclick="previewMergedPdf()" disabled>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                    Preview
+                </button>
+                <button class="btn btn-primary btn-large" id="download-btn" onclick="downloadMergedPdf()" disabled>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    Download Merged PDF
+                </button>
             </div>
         </div>
 
-        <div class="output-section">
-            <div class="section-header">
-                <h2>Output Queue</h2>
-                <span class="hint">Drag to reorder, click to remove</span>
-            </div>
-            <div class="output-queue" id="output-queue">
-                <div class="queue-empty">Selected pages will appear here</div>
-            </div>
-        </div>
+        <!-- Page Overlay Tool -->
+        <div id="overlay-tool" class="tool-panel">
+            <p class="tool-description">Overlay two PDF pages and paint to select which portions to keep</p>
 
-        <div class="actions">
-            <button class="btn btn-secondary btn-large" id="preview-btn" onclick="previewMergedPdf()" disabled>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                    <circle cx="12" cy="12" r="3"/>
-                </svg>
-                Preview
-            </button>
-            <button class="btn btn-primary btn-large" id="download-btn" onclick="downloadMergedPdf()" disabled>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                    <polyline points="7 10 12 15 17 10"/>
-                    <line x1="12" y1="15" x2="12" y2="3"/>
-                </svg>
-                Download Merged PDF
-            </button>
+            <div class="overlay-container">
+                <div class="overlay-sources">
+                    <div class="overlay-source" id="overlay-source-1">
+                        <div class="overlay-source-header">
+                            <span>Bottom Layer</span>
+                            <div class="overlay-source-actions">
+                                <button class="btn btn-small btn-secondary" onclick="document.getElementById('overlay-file-1').click()">Change File</button>
+                                <span class="layer-color" style="background: #3b82f6;"></span>
+                            </div>
+                        </div>
+                        <div class="drop-zone drop-zone-small" id="overlay-drop-1">
+                            <input type="file" id="overlay-file-1" accept="application/pdf" hidden>
+                            <div class="drop-zone-prompt">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="17 8 12 3 7 8"/>
+                                    <line x1="12" y1="3" x2="12" y2="15"/>
+                                </svg>
+                                <span>Drop PDF</span>
+                            </div>
+                            <div class="overlay-page-select" id="overlay-pages-1"></div>
+                        </div>
+                    </div>
+                    <div class="overlay-source" id="overlay-source-2">
+                        <div class="overlay-source-header">
+                            <span>Top Layer</span>
+                            <div class="overlay-source-actions">
+                                <button class="btn btn-small btn-secondary" onclick="document.getElementById('overlay-file-2').click()">Change File</button>
+                                <span class="layer-color" style="background: #ef4444;"></span>
+                            </div>
+                        </div>
+                        <div class="drop-zone drop-zone-small" id="overlay-drop-2">
+                            <input type="file" id="overlay-file-2" accept="application/pdf" hidden>
+                            <div class="drop-zone-prompt">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="17 8 12 3 7 8"/>
+                                    <line x1="12" y1="3" x2="12" y2="15"/>
+                                </svg>
+                                <span>Drop PDF</span>
+                            </div>
+                            <div class="overlay-page-select" id="overlay-pages-2"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overlay-editor">
+                    <div class="overlay-controls" id="overlay-controls">
+                        <div class="control-group">
+                            <label>Brush Size</label>
+                            <input type="range" id="brush-size" min="5" max="100" value="30">
+                            <span id="brush-size-value">30px</span>
+                        </div>
+                        <div class="control-group">
+                            <label>Paint Mode</label>
+                            <div class="btn-group">
+                                <button class="btn btn-small active" id="mode-bottom" onclick="Overlay.setBrushMode('bottom')">
+                                    <span class="layer-dot" style="background: #3b82f6;"></span>
+                                    Reveal Bottom
+                                </button>
+                                <button class="btn btn-small" id="mode-top" onclick="Overlay.setBrushMode('top')">
+                                    <span class="layer-dot" style="background: #ef4444;"></span>
+                                    Reveal Top
+                                </button>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label>Preview Opacity</label>
+                            <input type="range" id="preview-opacity" min="0" max="100" value="50">
+                            <span id="preview-opacity-value">50%</span>
+                        </div>
+                        <div class="control-group">
+                            <button class="btn btn-small btn-secondary" onclick="Overlay.resetMask()">Reset Mask</button>
+                            <button class="btn btn-small btn-secondary" onclick="Overlay.fillBottom()">All Bottom</button>
+                            <button class="btn btn-small btn-secondary" onclick="Overlay.fillTop()">All Top</button>
+                        </div>
+                    </div>
+
+                    <div class="overlay-workspace" id="overlay-workspace">
+                        <div class="overlay-placeholder">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                <line x1="3" y1="9" x2="21" y2="9"/>
+                                <line x1="9" y1="21" x2="9" y2="9"/>
+                            </svg>
+                            <span>Upload PDFs and select a page from each to begin</span>
+                        </div>
+                        <div class="overlay-canvas-container" id="overlay-canvas-container">
+                            <canvas id="bottom-canvas"></canvas>
+                            <canvas id="top-canvas"></canvas>
+                            <canvas id="mask-canvas"></canvas>
+                            <canvas id="composite-canvas"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-secondary btn-large" id="overlay-preview-btn" onclick="Overlay.preview()" disabled>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                    Preview Result
+                </button>
+                <button class="btn btn-primary btn-large" id="overlay-download-btn" onclick="Overlay.download()" disabled>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    Download Result
+                </button>
+            </div>
         </div>
     </div>
 
@@ -110,5 +240,6 @@
     </div>
 
     <script src="app.js"></script>
+    <script src="overlay.js"></script>
 </body>
 </html>

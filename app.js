@@ -18,7 +18,27 @@ const state = {
 document.addEventListener('DOMContentLoaded', () => {
     setupDropZone(1);
     setupDropZone(2);
+    setupTabs();
 });
+
+// Setup tab switching
+function setupTabs() {
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Update active tab
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            // Show corresponding panel
+            const targetId = tab.dataset.tab + '-tool';
+            document.querySelectorAll('.tool-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            document.getElementById(targetId).classList.add('active');
+        });
+    });
+}
 
 // Setup drop zone for a PDF slot
 function setupDropZone(pdfId) {

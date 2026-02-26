@@ -26,11 +26,51 @@ header h1 {
     font-size: 2rem;
     font-weight: 600;
     color: #1a1a2e;
+    margin-bottom: 1rem;
 }
 
-.subtitle {
+/* Tabs */
+.tabs {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.tab {
+    padding: 0.6rem 1.5rem;
+    border: none;
+    background: #e8e8e8;
     color: #666;
-    margin-top: 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tab:hover {
+    background: #ddd;
+}
+
+.tab.active {
+    background: white;
+    color: #0066cc;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Tool Panels */
+.tool-panel {
+    display: none;
+}
+
+.tool-panel.active {
+    display: block;
+}
+
+.tool-description {
+    text-align: center;
+    color: #666;
+    margin-bottom: 1.5rem;
 }
 
 /* PDF Panels */
@@ -487,4 +527,242 @@ header h1 {
     .pdf-name {
         max-width: 100%;
     }
+}
+
+/* Overlay Tool Styles */
+.overlay-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.overlay-sources {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.overlay-source {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.overlay-source-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    font-weight: 500;
+    color: #444;
+}
+
+.overlay-source-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.layer-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+}
+
+.layer-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+
+.drop-zone-small {
+    min-height: 150px;
+    padding: 1rem;
+}
+
+.drop-zone-small .drop-zone-prompt {
+    min-height: 120px;
+    font-size: 0.9rem;
+}
+
+.drop-zone-small .drop-zone-prompt svg {
+    margin-bottom: 0.5rem;
+}
+
+.overlay-page-select {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.overlay-page-thumb {
+    width: 80px;
+    position: relative;
+    cursor: pointer;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s;
+    border: 2px solid transparent;
+}
+
+.overlay-page-thumb:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.overlay-page-thumb.selected {
+    border-color: #0066cc;
+}
+
+.overlay-page-thumb canvas {
+    display: block;
+    width: 100%;
+}
+
+.overlay-page-thumb .page-number {
+    font-size: 0.65rem;
+    padding: 0.2rem;
+}
+
+/* Overlay Editor */
+.overlay-editor {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.overlay-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    padding: 1rem 1.25rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    align-items: center;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.control-group label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #555;
+    white-space: nowrap;
+}
+
+.control-group input[type="range"] {
+    width: 100px;
+    cursor: pointer;
+}
+
+.control-group span:not(.layer-dot) {
+    font-size: 0.8rem;
+    color: #888;
+    min-width: 40px;
+}
+
+.btn-group {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.btn-group .btn {
+    border-radius: 4px;
+}
+
+.btn-group .btn.active {
+    background: #0066cc;
+    color: white;
+}
+
+.overlay-workspace {
+    min-height: 400px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f0f0f0;
+}
+
+.overlay-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #999;
+    gap: 1rem;
+}
+
+.overlay-placeholder svg {
+    opacity: 0.5;
+}
+
+.overlay-canvas-container {
+    position: relative;
+    display: none;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    max-width: 100%;
+    max-height: 600px;
+}
+
+.overlay-canvas-container.active {
+    display: block;
+    width: auto !important;
+    height: auto !important;
+}
+
+.overlay-canvas-container canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.overlay-canvas-container #composite-canvas {
+    position: relative;
+    cursor: crosshair;
+    max-width: 100%;
+    max-height: 600px;
+    width: auto;
+    height: auto;
+}
+
+.overlay-canvas-container #bottom-canvas,
+.overlay-canvas-container #top-canvas,
+.overlay-canvas-container #mask-canvas {
+    pointer-events: none;
+    display: none;
+}
+
+/* Responsive for overlay */
+@media (max-width: 900px) {
+    .overlay-sources {
+        grid-template-columns: 1fr;
+    }
+
+    .overlay-controls {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+.btn-secondary.btn-large {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+}
+
+.btn-secondary.btn-large:disabled {
+    background: #e0e0e0;
+    color: #999;
+    cursor: not-allowed;
 }
