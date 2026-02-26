@@ -24,6 +24,21 @@ document.addEventListener('DOMContentLoaded', () => {
 // Setup tab switching
 function setupTabs() {
     const tabs = document.querySelectorAll('.tab');
+
+    // Restore saved tab
+    const savedTab = localStorage.getItem('activeTab');
+    if (savedTab) {
+        const targetTab = document.querySelector(`.tab[data-tab="${savedTab}"]`);
+        if (targetTab) {
+            tabs.forEach(t => t.classList.remove('active'));
+            targetTab.classList.add('active');
+            document.querySelectorAll('.tool-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            document.getElementById(savedTab + '-tool').classList.add('active');
+        }
+    }
+
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
             // Update active tab
@@ -36,6 +51,9 @@ function setupTabs() {
                 panel.classList.remove('active');
             });
             document.getElementById(targetId).classList.add('active');
+
+            // Save to localStorage
+            localStorage.setItem('activeTab', tab.dataset.tab);
         });
     });
 }
