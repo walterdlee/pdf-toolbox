@@ -2,6 +2,8 @@
 
 A local web app with tools for working with PDF files.
 
+https://walterdlee.github.io/pdf-toolbox/
+
 ## Tools
 
 ### Page Merger
